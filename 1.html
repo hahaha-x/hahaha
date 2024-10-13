@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fruit Slice Game</title>
+<style>
+    body {
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        background-color: #f0f0f0;
+    }
+    canvas {
+        background-color: #fff;
+        border: 1px solid #000;
+    }
+</style>
+</head>
+<body>
+<canvas id="gameCanvas" width="480" height="320"></canvas>
+
+<script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    let fruit = {
+        x: 240,
+        y: 160,
+        width: 50,
+        height: 50,
+        speed: 2,
+        dx: 0,
+        dy: 0,
+        falling: false
+    };
+    let score = 0;
+    let lastFruitTime = 0;
+    const gravity = 0.2;
+    const releaseGravity = 0.05;
+    const releaseForce = -5;
+
+    function drawFruit() {
+        ctx.fillStyle = '#f00';
+        ctx.fillRect(fruit.x, fruit.y, fruit.width, fruit.height);
+    }
+
+    function drawScore() {
+        ctx.fillStyle = '#000';
+        ctx.font = '20px Arial';
+        ctx.fillText('Score: ' + score, 10, 30);
+    }
+
+    function updateFruit() {
+        if (!fruit.falling) {
+            fruit.x = Math.random() * (canvas.width - fruit.width);
+            fruit.y = 0;
+            fruit.dy = gravity;
+            fruit.falling = true;
+        }
+
+        fruit.dy += gravity;
+        fruit.y += fruit.dy;
+
+        if (fruit.y > canvas.height - fruit.height) {
+            fruit.y = canvas.height - fruit.height;
+            fruit.falling = false;
+        }
+    }
+
+    function gameLoop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawScore();
+        updateFruit();
+        drawFruit();
+        requestAnimationFrame(gameLoop);
+    }
+
+    function onCanvasClick(e) {
+        const clickX = e.clientX - canvas.offsetLeft;
+        const clickY = e.clientY - canvas.offsetTop;
+
+        if (fruit.falling && clickX > fruit.x && clickX < fruit.x + fruit.width &&
+            clickY > fruit.y && clickY < fruit.y + fruit.height) {
+            score += 1;
+            fruit.falling = false;
+            fruit.dy = 0;
+        }
+    }
+
+    canvas.addEventListener('click', onCanvasClick);
+    gameLoop();
+</script>
+</body>
+</html>
